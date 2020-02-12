@@ -1,0 +1,177 @@
+﻿.ui-dialog-titlebar-close {
+    display: none;
+}
+
+
+#bePatient {
+    font-size:1.2em;
+
+}
+
+#mainContainer {
+    max-width: 1080px;
+    margin: auto;
+}
+
+#demoBtns {
+    margin: 10px 0px;
+}
+
+.divisor {
+    margin-top: 10px;
+}
+
+button:hover {
+    color: darkgreen;
+}
+
+button.demo {
+    border-color: orange;
+    font-size: .9em;
+}
+
+button.dnldBtn {
+    margin: 4px 4px 4px 0;
+}
+
+button {
+    margin-right: 5px;
+}
+
+.tableHeader {
+    display: table-cell;
+    font-family: sans-serif;
+    font-size: 0.95em;
+    border: 1px solid darkgrey;     
+    text-align: center;
+        margin: 0px;
+    padding: 5px 5px 5px 5px;
+    vertical-align: middle;
+}
+
+.table {
+    display: table;
+}
+
+.tableRow {
+    display: table-row;
+}
+
+.tableCell {
+    display: table-cell;
+    padding: 5px 5px;
+    font-family: sans-serif;
+    font-size: .9em;
+    border: 1px solid darkgrey;
+    vertical-align: middle;
+    height: 11em;
+}
+
+.optBurnin:disabled {
+    display: none;
+}
+
+#dstrnContainer, #interpretationContainer, #mcmcContainer, #meContainer, #muPriorContainer {
+    border: 1px solid red hidden;
+}
+
+input[type=text].invalid, textarea.invalid {
+    border-bottom-color: red;
+}
+
+    input[type=text].invalid:disabled, textarea.invalid:disabled {
+        border-bottom-color: orange;
+        background-color: rgba(164, 164, 164, 0.15);
+    }
+
+.DEcol1 {
+    width: 280px;
+}
+
+.DEcol2 {
+    width: 333px;
+}
+
+.DEcol3 {
+    width: 333px;
+}
+
+.DEcol2_3 {
+    width: 678px;
+}
+
+.DEcol1_2_3 {
+    width: 970px;
+}
+
+.rdGroup {
+    border: 1px solid lightgrey;
+    padding: 3px;
+    margin-right: 2em;
+    border-radius: 5px;
+    margin-bottom: 2px;
+}
+
+#obsValues {
+    /*margin: 2px;*/
+    width: 15em;
+    height: 12em;
+    /*border: 1px solid darkblue;*/
+    height: 100%;
+    margin-top: 2px;
+}
+
+input[type=text] {
+    background-color: rgb(250,250, 250);
+    border-width: 0 0 1px 0;
+    border-color: darkblue;
+    width: 7em;
+    text-align: center;
+    font-size: .8em;
+}
+
+#MEBox {
+    visibility: visible;
+}
+
+.minmax {
+    padding-left: 3em;
+    font-size: 0.90em;
+    padding-top: 2px;
+}
+
+.rightJustLbl, .rightJustLbl2, .rightJustLbl3 {
+    width: 9em;
+    text-align: right;
+    display: inline-block;
+    font-size: .9em;
+}
+
+.rightJustLbl2 {
+    width: 14em;
+}
+
+.rightJustLbl3 {
+    width: 20em;
+}
+
+.longLabel {
+    padding-bottom: 4px;
+}
+
+div.lang-switcher {
+  float: right;
+}
+
+span.lang.selected {
+  font-weight: bold;
+  color: purple;
+}
+
+body[data-lang="fr"] span.append-colon:after, body[data-lang="fr"] label.append-colon:after {
+  content: ' : ';
+}
+
+body[data-lang="en"] span.append-colon:after, body[data-lang="en"] label.append-colon:after {
+  content: ' : ';
+}

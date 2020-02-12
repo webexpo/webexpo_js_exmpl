@@ -1,0 +1,12 @@
+﻿body {
+}
+
+.wrkrNumRes > div.wrkrIdent {
+    padding-top : 20px;
+    padding-left : 10px;
+}
+#workerNumResContainer > span, #numRes > span {
+    font-size: 1.1em;
+    margin-top: 10px;
+    font-weight: bold;
+}

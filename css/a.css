@@ -1,0 +1,18 @@
+.inline-div {
+    display:inline-block;
+}
+
+.inline-txtarea {
+    resize: none;
+    border: 1px solid grey;
+    width: 12em;
+    height: 15em;
+    font-size: 90%;
+}
+
+.quantDef {
+    width : 5em;
+    text-align: center;
+    font-size: 75%;
+    
+}

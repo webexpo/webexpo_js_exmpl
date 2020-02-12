@@ -1,0 +1,251 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <link href="js/jquery/jquery-ui.css" rel="stylesheet" />
+    <link href="css/shared.css" rel="stylesheet" />
+    <link href="css/seg.css" rel="stylesheet" />
+    <style>
+    </style>
+    <title data-i18n="appname-title-seg"></title>
+    <script src="js/jquery/jquery-3.2.1.js"></script>
+    <script src="js/jquery/jquery-ui.js"></script>
+    <script src="webexpo/dataPreparation/A.js"></script>
+    <script src="webexpo/dataPreparation/G.js"></script>
+    <script src="webexpo/dataPreparation/U.js"></script>
+    <script src="webexpo/dataPreparation/M0.js"></script>
+    <script src="webexpo/model/M2modelIntro.js"></script>
+    <script src="webexpo/model/M2modelPerSe.js"></script>
+    <script src="webexpo/model/M2modelValidation.js"></script>
+    <script src="webexpo/randomSampleGeneration/MT.js"></script>
+    <script src="webexpo/randomSampleGeneration/NUM.js"></script>
+    <script src="webexpo/randomSampleGeneration/O.js"></script>
+    <script src="webexpo/randomSampleGeneration/S.js"></script>
+    <script src="webexpo/resultInterpretation/x.js"></script>
+    <script src="webexpo/xSEG.js"></script>
+    
+    <script src="js/jquery.i18n.js"></script>
+    <script src="js/jquery.i18n.messagestore.js"></script>
+    
+    <script type="text/javascript">
+        initLocale();
+        
+        $(document).ready(function () {
+          translatePage();
+          
+            /*
+            var obs = [28.9, 19.4, 5.5, 149.9, 26.42, 56.1];
+            $("#obsValues").val(obs.join("\n"));
+            */
+            zygotine.SEG.ready();
+            $("#meContainer").hide();
+            //$('.demo').hide();
+            $('#normExpostatsWoPDSBtn').click(function () { zygotine.SEG.tests.ecrireNormExpostatsWoPDS(); });
+            $('#normExpostatsWithPDSBtn').click(function () { zygotine.SEG.tests.ecrireNormExpostatsWithPDS(); });
+            $('#logNExpostatsWoPDSBtn').click(function () { zygotine.SEG.tests.ecrireLogNExpostatsWoPDS(); });
+            $('#logNExpostatsWithPDSBtn').click(function () { zygotine.SEG.tests.ecrireLogNExpostatsWithPDS(); });
+            $('#normUniformBtn').click(function () { zygotine.SEG.tests.ecrireNormUniform(); });
+            $('#logNUniformBtn').click(function () { zygotine.SEG.tests.ecrireLogNUniform(); });
+        });
+    </script>
+    <meta charset="utf-8" />
+</head>
+<body style="margin-left:1em;" data-lang="fr">
+    <section id="mainContainer">
+        <section class="table">
+            <div class="tableRow">
+              <div class="lang-switcher">
+                <a href="" class="lang fr">FR</a>
+                <a href="#" class="lang en">EN</a>
+              </div>
+            </div>
+            <div class="tableRow">
+              <div data-i18n="appname-title-seg" class="tableCell DEcol1_2_3" style="height: 2em;border-bottom:none; text-align:center; vertical-align: middle; font-size: 1.1em; font-weight: bold;">
+                  <!-- Analyse : Groupe d'exposition similaire-->
+              </div>
+            </div>
+        </section>
+        <section id="inputData" class="table">
+            <div class="tableRow">
+                <div class="tableHeader DEcol1">Observations <span id="obsValueCount"></span></div>
+                <section class="table">
+                    <div class="tableRow">
+                      <div class="tableHeader DEcol2" data-i18n="selection-modele"></div>
+                      <div class="tableHeader DEcol3" data-i18n="params-mcmc"></div>
+                    </div>
+                </section>
+            </div>
+            <div class="tableRow">
+                <div class="tableCell DEcol1" style="text-align:center;">
+                    <textarea rows="5" id="obsValues" title="a"></textarea>
+                </div>
+                <section class="table">
+                    <div class="tableRow">
+                        <div class="tableCell DEcol2">
+                            <div id="dstrnContainer" class="rdGroup">
+                              <div style="text-align:left;">Distribution</div>
+                              <div><input type="radio" id="logN" name="dstrn" value="logN" /><label for="logN" data-i18n="dist-log-normale"></label></div>
+                              <div><input type="radio" id="norm" name="dstrn" value="norm" /><label for="norm" data-i18n="dist-normale"></label></div>
+                            </div>
+                            <div id="meContainer" class="rdGroup">
+                                <!-- Erreur de mesure, choix entre MESD et MECV, pour chacun obligation de donner un intervalle  -->
+                                <div style="text-align:left;">Erreur de mesure</div>
+                                <input type="radio" id="meCV" name="me" /><label for="meCV">CV</label>
+                                <div class="minmax append-colon">min<input type="text" id="meCvMin" /><span>%</span> max&nbsp;:<input type="text" id="meCvMax" /><span>%</span></div>
+                                <input type="radio" id="meSd" name="me" /><label for="meSd">Écart type</label>
+                                <div class="minmax append-colon">min<input type="text" id="meSdMin" disabled /><span style="visibility:hidden;"><span>%</span></span>max&nbsp;:<input type="text" id="MeSdMax" /></div>
+                            </div>
+                        </div>
+                        <div class="tableCell DEcol3">
+                            <div id="mcmcContainer">
+                                <!-- Les paramètres MCMC nIter, nBurnin, monitorBurni, mais également les valeurs initiales de de mu et sd -->
+                                <div class="numInt"><span class="rightJustLbl append-colon" data-i18n="iters"></span><input type="text" id="nIter">(n)</div>
+                                <div class="numInt"><span class="rightJustLbl append-colon">Burnin</span>
+                                  <input type="text" id="nBurnin" />(n)
+                                  &nbsp;<input type="checkbox" id="monitorBurnin" style="vertical-align: middle"/><label for="monitorBurnin" data-i18n="surveiller" /> 
+                                </div>
+                                <br /><span data-i18n="vals-init" ></span>
+                                <div class="numInt"><span class="rightJustLbl append-colon">mu</span><input type="text" id="initMu"></div>
+                                <div class="numInt"><span class="rightJustLbl append-colon">sigma</span><input type="text" id="initSigma"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <!-- deuxième "rangée" du tableau -->
+            <div class="tableRow">
+                <!-- les étiquettes des colonnes pour commencer. Il n'y a que deux colonnes. -->
+                <div class="tableHeader DEcol1" data-i18n="params-interp"></div>
+                <section class="table">
+                    <div class="tableRow">
+                        <div class="tableHeader DEcol2_3" data-i18n="def-priors">
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <!-- le contenu de la deuxième rangée -->
+            <div class="tableRow">
+                <div style="text-align: center;" class="tableCell DEcol1">
+                    <div id="interpretationContainer">
+                      <div class="longLabel" style="padding-bottom:5px;"><span class="rightJustLbl2 append-colon" data-i18n="VLE"></span><input id="oel" type="text"><span style="visibility:hidden;">%</span></div>
+                      <div class="longLabel"><span class="rightJustLbl2 append-colon" data-i18n="prob-interv-cred"></span><input type="text" id="confidenceLevelForCredibileInterval"><span>%</span></div>
+                      <div class="longLabel"><span class="rightJustLbl2 append-colon" data-i18n="frac-depasse"></span><input type="text" id="fracThreshold"><span>%</span></div>
+                      <div class="longLabel"><span class="rightJustLbl2 append-colon" data-i18n="cent-crit"></span><input type="text" id="percOfInterest"><span>%</span></div>
+                    </div>
+                </div>
+                <section class="table">
+                    <div class="tableRow">
+                        <div class="tableCell DEcol2_3" style="height: 7em;border-bottom:none;">
+                            <div id="muPriorContainer" style="border:1px solid lightgrey;  padding:3px;  margin: 0 200px 0 220px;">
+                                <div style="text-align:center; font-size:1.1em; " data-i18n="prior-mu"></div>
+                                <div class="minmax" style="text-align:center;"><span class="rightJustLbl" style="width:3em;"> min&nbsp;:</span><input type="text" id="muLower" /></div>
+                                <div class="minmax" style="text-align:center;"><span class="rightJustLbl" style="width:3em;"> max&nbsp;:</span><input type="text" id="muUpper" /></div>
+                            </div>
+                            <div id="sigmaPriorContainer" class="rdGroup" style="margin:0 10em; margin-top:5px">
+                                <div data-i18n="prior-sigma"></div>
+                                <div style="display:block; vertical-align:middle; text-align:left;">
+                                    <input id="spExpostats" type="radio" name="sigmaPrior" value="expostats" /><label for="spExpostats">Expostats</label>
+                                </div>
+                                <div class="numInt"><span class="rightJustLbl2 append-colon">logSigmaMu</span><input id="logSigmaMu" type="text" class="expostatsDep"></div>
+                                <div class="numInt"><span class="rightJustLbl2 append-colon">logSigmaPrec</span><input id="logSigmaPrec" type="text" class="expostatsDep"></div>
+                                <div id="pastDataContainer" style="margin-left:6.5em; margin-top:.5em;">
+                                    <input id="withPastData" type="checkbox" class="expostatsDep" /><label for="withPastData" data-i18n="avec-don"></label>
+                                    <div class="numInt"><span class="rightJustLbl append-colon" data-i18n="moyenne"></span><input type="text" id="pdMean" class="pastDataDep"></div>
+                                    <div class="numInt"><span class="rightJustLbl append-colon" data-i18n="ecart-type"></span><input type="text" id="pdSd" class="pastDataDep"></div>
+                                    <div class="numInt"><span class="rightJustLbl append-colon" data-i18n="taille"></span><input type="text" id="pdN" class="pastDataDep">(n)</div>
+                                </div>
+                                <div style="display:block; vertical-align:middle; text-align:left;">
+                                    <input type="radio" id="spUniform" name="sigmaPrior" value="uniform" /><label for="spUniform" data-i18n="unif"></label>
+                                    <div class="numInt">
+                                        <label class="rightJustLbl2 append-colon" data-i18n="borne-inf"></label><input id="sdRangeInf" type="text" class="uniformDep">
+                                    </div>
+                                    <div class="numInt">
+                                        <label class="rightJustLbl2 append-colon" data-i18n="borne-sup"></label><input id="sdRangeSup" type="text" class="uniformDep">
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </section>
+                <!--/section-->
+            </div>
+        </section>
+        <section class="table">
+            <div class="tableRow">
+                <div class="tableCell DEcol1_2_3" style="height: 1em;border-bottom:none;">
+                    <button id="calcBtn" style="margin-right: 10px;" data-i18n="lancer"></button><button id="resetBtn" data-i18n="reinit"></button>
+                    <!--<div id="demoBtns" class="demo">
+                        <button id="normExpostatsWoPDSBtn" class="demo" data-i18n="norm-expo"></button>
+                        <button id="normExpostatsWithPDSBtn" class="demo" data-i18n="norm-expo-pds"></button>
+                        <button id="logNExpostatsWoPDSBtn" class="demo" data-i18n="log-norm-expo"></button>
+                        <button id="logNExpostatsWithPDSBtn" class="demo" data-i18n="log-norm-expo-pds"></button>
+                        <button id="normUniformBtn" class="demo" data-i18n="norm-unif"></button>
+                        <button id="logNUniformBtn" class="demo" data-i18n="log-norm-unif"></button>
+                    </div>-->
+
+                </div>
+            </div>
+        </section>
+
+        <section id="outputData" class="table">
+            <div id="bePatient" data-i18n="calc-en-cours"></div>
+            <div id="numRes">
+                <div data-i18n="resultats"></div>
+                <div id="gMean_NumRes" class="logN">
+                    <span class="rightJustLbl3 append-colon" data-i18n="moy-geom"></span><span class="VALUES">&nbsp;<span class="B"></span> [<span class="A"></span>,&nbsp;<span class="C"></span>] </span>
+                </div>
+                <div id="aMean_NumRes" class="logN  norm">
+                    <span class="rightJustLbl3 append-colon" data-i18n="moy-arith"></span><span class="VALUES">&nbsp;<span class="B"></span> [<span class="A"></span>,&nbsp;<span class="C"></span>] </span>
+                </div>
+                <div id="aMeanRisk_NumRes" class="logN  norm">
+                    <span class="rightJustLbl3 append-colon" data-i18n="risque-moy-arith"></span><span class="VALUES">&nbsp;<span class="R"></span>%</span>
+                </div>
+                <div id="gSd_NumRes" class="logN">
+                    <span class="rightJustLbl3 append-colon" data-i18n="et-geom"></span><span class="VALUES">&nbsp;<span class="B"></span> [<span class="A"></span>,&nbsp;<span class="C"></span>]</span>
+                </div>
+                <div id="aSd_NumRes" class="norm">
+                    <span class="rightJustLbl3 append-colon" data-i18n="ecart-type"></span><span class="VALUES">&nbsp;<span class="B"></span> [<span class="A"></span>,&nbsp;<span class="C"></span>]</span>
+                </div>
+                <div id="exceedanceFraction_NumRes" class="logN  norm">
+                    <span class="rightJustLbl3 append-colon" data-i18n="frac-depasse"></span><span class="VALUES">&nbsp;<span class="B"></span> [<span class="A"></span>,&nbsp;<span class="C"></span>]</span>
+                </div>
+                <div id="exceedanceFractionRisk_NumRes" class="logN  norm">
+                    <span class="rightJustLbl3 append-colon" data-i18n="risque-frac"></span><span class="VALUES">&nbsp;<span class="R"></span>%</span>
+                </div>
+                <div id="percOfInterest_NumRes" class="logN norm">
+                    <span class="rightJustLbl3 append-colon" data-i18n="cent-crit"></span><span class="VALUES">&nbsp;<span class="B"></span> [<span class="A"></span>,&nbsp;<span class="C"></span>]</span>
+                </div>
+                <div id="percOfInterestRisk_NumRes" class="logN norm">
+                    <span class="rightJustLbl3 append-colon" data-i18n="risque-cc"></span><span class="VALUES">&nbsp;<span class="R"></span>%</span>
+                </div>
+                <div class="divisor"></div>
+                <div id="measure_NumRes" class="logN norm">
+                    <span class="rightJustLbl3 append-colon" data-i18n="repart-mes"></span><span class="VALUES"><span class="measure_NumRes"></span></span>
+                </div>
+                <div id="info_NumRes" class="logN norm">
+                    <span class="rightJustLbl3 append-colon">Date</span><span class="VALUES"><span class="when_NumRes"></span><span class="prngRoot_NumRes" style="color:grey; padding-left: 1em;" title="Racine des nombres aléatoires. A des fins de débogage."></span></span>
+                </div>
+                <div id="runTime_NumRes" class="logN norm">
+                    <span class="rightJustLbl3 append-colon" data-i18n="exec-mod"></span><span class="VALUES"><span class="runTime_NumRes"></span> sec.</span>
+                </div>
+                <div id="numRes_NumRes" class="logN norm">
+                    <span class="rightJustLbl3 append-colon" data-i18n="norm-expo"></span><span class="VALUES"><span class="numRes_NumRes"></span> sec.</span>
+                </div>
+            </div>
+            <section id="dnldChains" class="table" style="margin: 15px 5px 0 0;">
+                <div class="tableRow">
+                    <div class="tableCell" style=" width: 40em; padding: 5px 17px 5px 5px; height: 2em;">
+                        <button id="dnldSampleChainBtn" key="sampleChains" class="dnldBtn" data-i18n="telechargez"></button><button id="dnldBurninChainBtn" key="burninChains" class="dnldBtn">Télécharger les chaines 'burnin'</button>
+                    </div>
+                </div>
+            </section>
+        </section>
+    </section>
+    <!-- ui-dialog -->
+    <div id="dialog-message" title="" style="display:none;">
+        <p>
+        </p>
+    </div>
+
+</body>
+</html>
