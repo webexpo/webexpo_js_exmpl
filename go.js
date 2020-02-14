@@ -69,6 +69,11 @@ function drawTable3() {
     }
     $reportTable.find('tbody').append($('<tr>').append($('<td>').append(row.label)).append($('<td>').append(val)))
   })
+  
+  $('#tableTitle').text("Exposure metrics point estimates and credible intervals for an example of Bayesian calculation for the lognormal model")
+  
+  $(".table-div").show()
+  $('#loader').hide()
 }
   
 function drawTable4() {
@@ -83,37 +88,62 @@ function drawTable4() {
   zygotine.SEG.initDataEntries(false, true)
   let cUninf = doCalc()
   let numResUninf = cUninf.numRes
+  
+  zygotine.SEG.initDataEntries(true, true)
+  zygotine.SEG.setDataVal({
+    withPastData: true,
+    pdMean: Math.log(5) - Math.log(100),
+    pdSd: Math.log(2.4),
+    pdN: 5
+  })
+  let cPd = doCalc()
+  let numResPd = cPd.numRes
+  
+  let allRes = [numResInf, numResUninf, numResPd]
 
-  $reportTable.find('.heading').append($('<th>').append("Point estimates and 90% credible interval"))
+  $reportTable.find('.heading')
+              .append($('<th>').append("Informedvar"))
+              .append($('<th>').append("Uninformative"))
+              .append($('<th>').append("Past.data"))
   let rows = [
-    { resType: "gMean", label: "GM" },
-    { resType: "gSd", label: "GSD" },
-    { resType: "exceedanceFraction", label: "Exceedance fraction (%)", showRisk: true },
-    { resType: "percOfInterest", label: "95th percentile", showRisk: true },
-    { resType: "aihaBandP95", label: "AIHA band probabilities in % (95th percentile)" },
-    { resType: "aMean", label: "Arithmetic mean", showRisk: true },
-    { resType: "aihaBandAM", label: "AIHA band probabilities in % (AM)" }
+    { resType: "gMean", label: "GM (90% CrI)" },
+    { resType: "gSd", label: "GSD (90% CrI)" },
+    { resType: "exceedanceFraction", label: "Exceedance fraction (%)(90% CrI)" },
+    { resType: "percOfInterest", label: "95th percentile (90% CrI)" },
+    { resType: "percOfInterest", label: "Overexposure risk (%, P95)", showRisk: true },
+    { resType: "aMean", label: "AM (90% CrI)" },
+    { resType: "aMean", label: "Overexposure risk (%, AM)", showRisk: true }
   ]
   
   rows.forEach(function(row) {
-    let res = numResInf[row.resType]
-    let val = ""
-    if ( res.q.length == 3 ) {
-      val = `${res.q[1].toFixed(1)} [${res.q[0].toFixed(1)} - ${res.q[2].toFixed(1)}] ${$.inArray(row.showRisk, [undefined, false]) >= 0 ? "" : ("Overexposure Risk: " + res.risk.toFixed(1) + '%')}`
-    } else
-    if ( res.q.length == 5 ) {
-      val = res.risk
-    }
-    $reportTable.find('tbody').append($('<tr>').append($('<td>').append(row.label)).append($('<td>').append(val)))
+    $tr = $("<tr>").append($("<td>").append(row.label))
+    allRes.forEach(function(numRes) {
+      let res = numRes[row.resType]
+      let val = ""
+      if ( $.inArray(row.showRisk, [undefined, false]) >= 0 ) {
+        val = showEstimateWInterval(res)
+      } else {
+        val = `${res.risk.toFixed(1)}%`
+      }
+      $tr.append($("<td>").append(val))
+    })
+    $reportTable.find('tbody').append($tr)
   })
   
-  $reportTable.show()
+  $('#tableTitle').text("Exposure metrics point estimates and credible intervals for 3 choices of prior distribution")
+  
+  $(".table-div").show()
   $('#loader').hide()
 }
 
 function resetTable()
 {
-  $reportTable.hide()
+  $(".table-div").hide()
   $reportTable.find('th:not(:first)').remove()
   $reportTable.find('tbody tr').remove()
+}
+
+function showEstimateWInterval(res)
+{
+  return `${res.q[1].toFixed(1)} [${res.q[0].toFixed(1)} - ${res.q[2].toFixed(1)}]`
 }

@@ -202,14 +202,21 @@ html, body {
 
 div.table-div {
   margin-top: 20px;
+  display: none;
 }
 
 #reportTable {
-  display: none;
   margin: auto;
 }
 
 #reportTable th, #reportTable td {
   border: 1px solid;
   padding: 4px;
+}
+
+#tableTitle {
+  text-align: center;
+  margin-bottom: 7px;
+  font-variant: small-caps;
+  color: darkgreen;
 }
