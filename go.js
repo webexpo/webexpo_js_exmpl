@@ -84,15 +84,21 @@ function drawTable4() {
   })
   let cInf = doCalc()
   let numResInf = cInf.numRes
+  zygotine.SEG.reset()
   
   zygotine.SEG.initDataEntries(false, true)
+  zygotine.SEG.setDataVal({
+    sdRangeInf: "0",
+    sdRangeSup: "2.3"
+  })
   let cUninf = doCalc()
   let numResUninf = cUninf.numRes
+  zygotine.SEG.reset()
   
   zygotine.SEG.initDataEntries(true, true)
   zygotine.SEG.setDataVal({
     withPastData: true,
-    pdMean: Math.log(5) - Math.log(100),
+    pdMean: Math.log(5),
     pdSd: Math.log(2.4),
     pdN: 5
   })
@@ -121,7 +127,7 @@ function drawTable4() {
       let res = numRes[row.resType]
       let val = ""
       if ( $.inArray(row.showRisk, [undefined, false]) >= 0 ) {
-        val = showEstimateWInterval(res)
+        val = showEstimateWInterval(res, 2)
       } else {
         val = `${res.risk.toFixed(1)}%`
       }
@@ -143,7 +149,7 @@ function resetTable()
   $reportTable.find('tbody tr').remove()
 }
 
-function showEstimateWInterval(res)
+function showEstimateWInterval(res, numDigitsAfterDecimal = 1)
 {
-  return `${res.q[1].toFixed(1)} [${res.q[0].toFixed(1)} - ${res.q[2].toFixed(1)}]`
+  return `${res.q[1].toFixed(numDigitsAfterDecimal)} [${res.q[0].toFixed(numDigitsAfterDecimal)} - ${res.q[2].toFixed(numDigitsAfterDecimal)}]`
 }
