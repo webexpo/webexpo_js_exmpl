@@ -11,7 +11,6 @@ class IrsstReportTable {
     if ( typeof isInfModel === 'undefined' ) {
       isInfModel = true
     }
-    let modelType = isInfModel ? 'inform' : 'unInform'
     
     // Force validation
     for ( var i in entries ) {
@@ -26,6 +25,7 @@ class IrsstReportTable {
     entries.dstrn.currentValue = this.isLogDstrn ? 'logN' : 'norm'
     
     let defVals = this.module.defaultEntryValues
+    let modelType = isInfModel ? (this.isSEGModel ? 'inform' : 'expostats') : (this.isSEGModel ? 'unInform' : 'uupOnSds')
     for ( var i in defVals ) {
       entries[i].currentValue = defVals[i][entries.dstrn.currentValue][modelType]
     }
@@ -33,6 +33,13 @@ class IrsstReportTable {
     for ( var entr in params ) {
       let val = params[entr]
       if ( $.isArray(val) ) {
+        if ( val.length && typeof(val[0]) === 'object' ) {
+          val = val.map(function(v) {
+            let workerId = Object.keys(v)[0]
+            let workerObs = v[workerId]
+            return workerObs.map(function(obs) { return `${obs}\t${workerId}` })
+          })
+        }
         val = val.join("\n")
       }
       entries[entr].currentValue = val
@@ -51,8 +58,8 @@ class IrsstReportTable {
       return { modelRes: model.result, 
                numRes: zygotine.X.getNumericalResult(
                         model.logN,
-                        model.result.chains.muSample.data,
-                        model.result.chains.sdSample.data,
+                        model.result.chains[`mu${this.isSEGModel ? "" : "Overall"}Sample`].data,
+                        model.result.chains[`${this.isSEGModel ? "sd" : "sigma"}${this.isSEGModel ? "" : "Between"}Sample`].data,
                         model.oel,
                         model.confidenceLevelForCredibileInterval,
                         model.fracThreshold,
@@ -123,6 +130,7 @@ class Table3 extends IrsstReportTable {
     return { numericalResults: [numRes], title, headers, rows }
   }
 }
+
 class Table4 extends IrsstReportTable {
   constructor() {
     super()
@@ -167,5 +175,42 @@ class Table4 extends IrsstReportTable {
     ]
     
     return { numericalResults: allRes, title, headers, rows }
+  }
+}
+
+class Table6 extends IrsstReportTable {
+  constructor() {
+    super(false)
+    this.initEntries({
+      obsValues: [ { "worker-01" : [185, 34.8, 16.7, 12.4, 18.6, 47.4, 52.6, 15.3, 27.6, 26.3] },
+                   { "worker-02" : [4.79, 23, 7.54, 62.3, 8.55, 9.28, 43.6, 94.2, 44.6, 66.6] },
+                   { "worker-03" : [8.85, 31.7, 15.8, 89.6, 164, 40.5, 47.6, 75.5, 10.7, 62.3] },
+                   { "worker-04" : [16.4, 6.91, 87.4, 20, 16.8, 7.12, 6.99, 16.4, 12.6, 63.9] },
+                   { "worker-05" : [14.7, 59.6, 15, 21.8, 20.6, 96.1, 16.8, 15.8, 8.02, 26.7] },
+                   { "worker-06" : [37.9, 96.9, 40.8, 106, 21.7, 25.8, 51.3, 23, 18.9, 20.2] },
+                   { "worker-07" : [22, 44.8, 37.5, 16.6, 30.7, 7.07, 7.18, 80.9, 44.5, 135] },
+                   { "worker-08" : [69.9, 30.5, 33.4, 53, 70.7, 78.3, 18, 45.2, 51.4, 33.7] },
+                   { "worker-09" : [28.1, 7.49, 16, 23, 99.9, 12, 11.8, 57.4, 8.79, 24] },
+                   { "worker-10" : [113, 7.68, 85.6, 196, 35, 17.6, 60.7, 15.5, 34.3, 12.1] } ],
+        oel: "150"
+    })
+  }
+    
+  defineTableCells() {
+    let c = this.calculate()  
+    let numRes = c.numRes
+  
+    let title = "Exposure metrics point estimates and credible intervals for an example of Bayesian calculation for the lognormal model"
+    let headers = [ "Point estimates and 90% credible interval" ]
+    let rows = [
+      { resType: "gMean", label: "GM" },
+      { resType: "gSd", label: "GSD" },
+      { resType: "exceedanceFraction", label: "Exceedance fraction (%)", appendRisk: true },
+      { resType: "percOfInterest", label: "95th percentile", appendRisk: true },
+      { resType: "aihaBandP95", label: "AIHA band probabilities in % (95th percentile)", showRisk: true },
+      { resType: "aMean", label: "Arithmetic mean", appendRisk: true },
+      { resType: "aihaBandAM", label: "AIHA band probabilities in % (AM)", showRisk: true }
+    ]
+    return { numericalResults: [numRes], title, headers, rows }
   }
 }

@@ -3,7 +3,7 @@ var entries
 
 $(document).ready(function() {
   $reportTable = $('#reportTable')
-  let tableNos = [3,4]
+  let tableNos = [3,4,6]
   tableNos.forEach(function(i) {
     $('#table2Display').append($(`<option value=${i}>`).append(`Table ${i}`))
   })
@@ -20,6 +20,9 @@ function drawTable()
       break
     case '4' :
       tableObj = new Table4()
+      break
+    case '6' :
+      tableObj = new Table6()
       break
   }
   setTimeout( function() { tableObj.draw() }, 50)
