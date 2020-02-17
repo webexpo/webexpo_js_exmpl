@@ -61,13 +61,32 @@ class IrsstReportTable {
     return false
   }
 
-  fillTableCells() {
-    
+  defineTableCells() {
+    return { title: "--", numericalResults: [], headers: [], rows: [] }
   }
   
   draw() {
-    this.fillTableCells()
-    $('#tableTitle').text(this.getTableTitle())
+    let cells = this.defineTableCells()
+    $('#tableTitle').text(cells.title)
+    cells.headers.forEach(function(header) {
+      $reportTable.find('.heading')
+        .append($('<th>').append(header))
+    })
+    
+    cells.rows.forEach(function(row) {
+      let $tr = $("<tr>").append($("<td>").append(row.label))
+      cells.numericalResults.forEach(function(numRes) {
+        let res = numRes[row.resType]
+        let val = ""
+        if ( $.inArray(row.showRisk, [undefined, false]) >= 0 ) {
+          val = showEstimateWInterval(res, 2, row.appendRisk === true)
+        } else {
+          val = showRisk(res)
+        }
+        $tr.append($("<td>").append(val))
+      })
+      $reportTable.find('tbody').append($tr)
+    })
     $(".table-div").show()
     $('#loader').hide()
   }
@@ -86,36 +105,22 @@ class Table3 extends IrsstReportTable {
     })
   }
     
-  getTableTitle() {
-    return "Exposure metrics point estimates and credible intervals for an example of Bayesian calculation for the lognormal model"
-  }
-  
-  fillTableCells() {
+  defineTableCells() {
     let c = this.calculate()  
     let numRes = c.numRes
-    
-    $reportTable.find('.heading').append($('<th>').append("Point estimates and 90% credible interval"))
+  
+    let title = "Exposure metrics point estimates and credible intervals for an example of Bayesian calculation for the lognormal model"
+    let headers = [ "Point estimates and 90% credible interval" ]
     let rows = [
       { resType: "gMean", label: "GM" },
       { resType: "gSd", label: "GSD" },
-      { resType: "exceedanceFraction", label: "Exceedance fraction (%)", showRisk: true },
-      { resType: "percOfInterest", label: "95th percentile", showRisk: true },
-      { resType: "aihaBandP95", label: "AIHA band probabilities in % (95th percentile)" },
-      { resType: "aMean", label: "Arithmetic mean", showRisk: true },
-      { resType: "aihaBandAM", label: "AIHA band probabilities in % (AM)" }
+      { resType: "exceedanceFraction", label: "Exceedance fraction (%)", appendRisk: true },
+      { resType: "percOfInterest", label: "95th percentile", appendRisk: true },
+      { resType: "aihaBandP95", label: "AIHA band probabilities in % (95th percentile)", showRisk: true },
+      { resType: "aMean", label: "Arithmetic mean", appendRisk: true },
+      { resType: "aihaBandAM", label: "AIHA band probabilities in % (AM)", showRisk: true }
     ]
-
-    rows.forEach(function(row) {
-      let res = numRes[row.resType]
-      let val = ""
-      if ( res.q.length == 3 ) {
-        val = `${res.q[1].toFixed(1)} [${res.q[0].toFixed(1)} - ${res.q[2].toFixed(1)}] ${$.inArray(row.showRisk, [undefined, false]) >= 0 ? "" : ("Overexposure Risk: " + res.risk.toFixed(1) + '%')}`
-      } else
-      if ( res.q.length == 5 ) {
-        val = res.risk
-      }
-      $reportTable.find('tbody').append($('<tr>').append($('<td>').append(row.label)).append($('<td>').append(val)))
-    })
+    return { numericalResults: [numRes], title, headers, rows }
   }
 }
 class Table4 extends IrsstReportTable {
@@ -127,11 +132,7 @@ class Table4 extends IrsstReportTable {
     })
   }
   
-  getTableTitle() {
-    return "Exposure metrics point estimates and credible intervals for 3 choices of prior distribution"
-  }
-  
-  fillTableCells() {
+  defineTableCells() {
     let cInf = this.calculate()
     let numResInf = cInf.numRes
       
@@ -153,10 +154,8 @@ class Table4 extends IrsstReportTable {
   
     let allRes = [numResInf, numResUninf, numResPd]
 
-    $reportTable.find('.heading')
-                .append($('<th>').append("Informedvar"))
-                .append($('<th>').append("Uninformative"))
-                .append($('<th>').append("Past.data"))
+    let title = "Exposure metrics point estimates and credible intervals for 3 choices of prior distribution"
+    let headers = ["Informedvar", "Uninformative", "Past.data"]
     let rows = [
       { resType: "gMean", label: "GM (90% CrI)" },
       { resType: "gSd", label: "GSD (90% CrI)" },
@@ -166,20 +165,7 @@ class Table4 extends IrsstReportTable {
       { resType: "aMean", label: "AM (90% CrI)" },
       { resType: "aMean", label: "Overexposure risk (%, AM)", showRisk: true }
     ]
-
-    rows.forEach(function(row) {
-      let $tr = $("<tr>").append($("<td>").append(row.label))
-      allRes.forEach(function(numRes) {
-        let res = numRes[row.resType]
-        let val = ""
-        if ( $.inArray(row.showRisk, [undefined, false]) >= 0 ) {
-          val = showEstimateWInterval(res, 2)
-        } else {
-          val = `${res.risk.toFixed(1)}%`
-        }
-        $tr.append($("<td>").append(val))
-      })
-      $reportTable.find('tbody').append($tr)
-    })
+    
+    return { numericalResults: allRes, title, headers, rows }
   }
 }

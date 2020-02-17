@@ -32,7 +32,11 @@ function resetTable()
   $reportTable.find('tbody tr').remove()
 }
 
-function showEstimateWInterval(res, numDigitsAfterDecimal = 1)
+function showEstimateWInterval(res, numDigitsAfterDecimal = 1, appendRisk = false)
 {
-  return `${res.q[1].toFixed(numDigitsAfterDecimal)} [${res.q[0].toFixed(numDigitsAfterDecimal)} - ${res.q[2].toFixed(numDigitsAfterDecimal)}]`
+  return `${res.q[1].toFixed(numDigitsAfterDecimal)} [${res.q[0].toFixed(numDigitsAfterDecimal)} - ${res.q[2].toFixed(numDigitsAfterDecimal)}]${appendRisk ? ` Overexposure risk: ${showRisk(res)}` : ""}`
+}
+
+function showRisk(res) {
+  return res.q.length == 3 ? `${res.risk.toFixed(1)}%` : res.risk
 }
