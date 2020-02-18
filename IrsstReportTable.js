@@ -252,7 +252,7 @@ class Table8 extends IrsstReportTable {
         { "worker-2" : [61.1, 5.27, 30.4, 31.7] },
         { "worker-3": [20.5, 16.5, 15.5, 71.5] }
       ],
-      oel: 85
+      oel: 150
     })
   }
     
@@ -270,7 +270,11 @@ class Table8 extends IrsstReportTable {
       { resType: "rho", label: "Probability that rho>0.2", showRisk: true },
       { resType: "rRatio", label: "R.ratio (90% CrI)" },
       { resType: "rRatio", label: "Probability that R>2", showRisk: true, riskIdx: 0 },
-      { resType: "rRatio", label: "Probability that R>10", showRisk: true, riskIdx: 1 }
+      { resType: "rRatio", label: "Probability that R>10", showRisk: true, riskIdx: 1 },
+      { resType: "probIndOverXPerc", label: "Probability of individual overexposure (95th percentile) in % (90% CrI)" },
+      { resType: "probIndOverXPerc", label: "Chances that the above probability is >20%", showRisk: true },
+      { resType: "probIndOverXAMean", label: "Probability of individual overexposure (arithmetic mean) in % (90% CrI)" },
+      { resType: "probIndOverXAMean", label: "Chances that the above probability is >20%", showRisk: true }
     ]
     return { numericalResults: [numRes], title, headers, rows }
   }
