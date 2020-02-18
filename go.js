@@ -1,9 +1,10 @@
 var tableObj
 var entries
+var lastNumres
 
 $(document).ready(function() {
   $reportTable = $('#reportTable')
-  let tableNos = [3,4,6]
+  let tableNos = [3,4,6,8]
   tableNos.forEach(function(i) {
     $('#table2Display').append($(`<option value=${i}>`).append(`Table ${i}`))
   })
@@ -24,6 +25,9 @@ function drawTable()
     case '6' :
       tableObj = new Table6()
       break
+    case '8' :
+      tableObj = new Table8()
+      break
   }
   setTimeout( function() { tableObj.draw() }, 50)
 }
@@ -40,6 +44,11 @@ function showEstimateWInterval(res, numDigitsAfterDecimal = 1, appendRisk = fals
   return `${res.q[1].toFixed(numDigitsAfterDecimal)} [${res.q[0].toFixed(numDigitsAfterDecimal)} - ${res.q[2].toFixed(numDigitsAfterDecimal)}]${appendRisk ? ` Overexposure risk: ${showRisk(res)}` : ""}`
 }
 
-function showRisk(res) {
-  return res.q.length == 3 ? `${res.risk.toFixed(1)}%` : res.risk
+function showRisk(res, idx = undefined) {
+  if ( res.q.length == 3 ) {
+    let risk = typeof idx === 'undefined' ? res.risk : res.risk[idx]
+    return `${risk.toFixed(1)}%`
+  } else {
+     return res.risk
+  }
 }

@@ -37,10 +37,10 @@ class IrsstReportTable {
           val = val.map(function(v) {
             let workerId = Object.keys(v)[0]
             let workerObs = v[workerId]
-            return workerObs.map(function(obs) { return `${obs}\t${workerId}` })
+            return workerObs.map(function(obs) { return `${obs}\t${workerId}` }).join('\r\n')
           })
         }
-        val = val.join("\n")
+        val = val.join("\r\n")
       }
       entries[entr].currentValue = val
     }
@@ -55,15 +55,30 @@ class IrsstReportTable {
     model.validate()
     if (!model.hasError) {
       model.doCalculation()
-      return { modelRes: model.result, 
-               numRes: zygotine.X.getNumericalResult(
-                        model.logN,
-                        model.result.chains[`mu${this.isSEGModel ? "" : "Overall"}Sample`].data,
-                        model.result.chains[`${this.isSEGModel ? "sd" : "sigma"}${this.isSEGModel ? "" : "Between"}Sample`].data,
-                        model.oel,
-                        model.confidenceLevelForCredibileInterval,
-                        model.fracThreshold,
-                        model.percOfInterest) }
+      this.module.lastModel = model
+      let numRes = this.isSEGModel ?
+        zygotine.X.getNumericalResult(
+          model.logN,
+          model.result.chains.muSample.data,
+          model.result.chains.sdSample.data,
+          model.oel,
+          model.confidenceLevelForCredibileInterval,
+          model.fracThreshold,
+          model.percOfInterest) :
+        this.module.getGlobalResult(
+          model.logN,
+          model.result.chains.sigmaWithinSample.data,
+          model.result.chains.sigmaBetweenSample.data,
+          model.result.chains.muOverallSample.data,
+          model.oel,
+          model.confidenceLevelForCredibileInterval,
+          model.fracThreshold,
+          model.percOfInterest,
+          model.wwct,
+          model.rAppapCoverage,
+          model.probIndOverXThreshold)
+      lastNumres = numRes
+      return { modelRes: model.result, numRes }
     }
     return false
   }
@@ -88,7 +103,7 @@ class IrsstReportTable {
         if ( $.inArray(row.showRisk, [undefined, false]) >= 0 ) {
           val = showEstimateWInterval(res, 2, row.appendRisk === true)
         } else {
-          val = showRisk(res)
+          val = showRisk(res, row.riskIdx)
         }
         $tr.append($("<td>").append(val))
       })
@@ -198,18 +213,64 @@ class Table6 extends IrsstReportTable {
     
   defineTableCells() {
     let c = this.calculate()  
-    let numRes = c.numRes
+    let numResLowRho = c.numRes
   
-    let title = "Exposure metrics point estimates and credible intervals for an example of Bayesian calculation for the lognormal model"
-    let headers = [ "Point estimates and 90% credible interval" ]
+    this.initEntries({
+      obsValues: [
+        { "worker-01": [ 66.8, 46, 61.1, 54.6, 31.7, 74.3, 60.9, 53.4, 38.9, 27.5 ] },
+        { "worker-02": [ 14.2, 53.9, 21.8, 47.8, 48.8, 76.5, 41.3, 20.4, 31.9, 31.1 ] },
+        { "worker-03": [ 186, 84.6, 94.4, 218, 189, 130, 107, 80.6, 288, 173 ] },
+        { "worker-04": [ 23.5, 16.2, 40.2, 130, 42.2, 25.7, 35.4, 40.8, 109, 40.9 ] },
+        { "worker-05": [ 43.8, 31.1, 13.1, 24.1, 27.7, 23.9, 40.2, 60.3, 29.8, 37.2 ] },
+        { "worker-06": [ 41, 11.4, 4.44, 12.9, 22.7, 20.5, 12.6, 8.35, 13.6, 28.1 ] },
+        { "worker-07": [ 6.56, 9.5, 6.97, 5.92, 2.42, 14, 12.3, 3.07, 7.01, 6.49 ] },
+        { "worker-08": [ 9.21, 9.42, 28.7, 72.9, 35.6, 17.2, 20.2, 13.4, 10.5, 26.3 ] },
+        { "worker-09": [ 19.6, 14.3, 22.8, 35.1, 28.9, 36.9, 13, 13.3, 13.6, 37 ] },
+        { "worker-10": [ 78.7, 28.2, 41.3, 14.4, 72.9, 10.2, 16.2, 15.8, 42.2, 61 ] },
+      ]
+    })
+    
+    let c2 = this.calculate()  
+    let numResHighRho = c2.numRes
+    
+    let title = "Exposure metrics point estimates and credible intervals for an example of Bayesian calculation for the lognormal model (between-worker difference analyses"
+    let headers = [ "Low within-worker correlation (rho=0.06)", "High within-worker correlation (rho=0.66)"]
     let rows = [
       { resType: "gMean", label: "GM" },
-      { resType: "gSd", label: "GSD" },
-      { resType: "exceedanceFraction", label: "Exceedance fraction (%)", appendRisk: true },
-      { resType: "percOfInterest", label: "95th percentile", appendRisk: true },
-      { resType: "aihaBandP95", label: "AIHA band probabilities in % (95th percentile)", showRisk: true },
-      { resType: "aMean", label: "Arithmetic mean", appendRisk: true },
-      { resType: "aihaBandAM", label: "AIHA band probabilities in % (AM)", showRisk: true }
+      { resType: "gSd", label: "GSD" }
+    ]
+    return { numericalResults: [numResLowRho, numResHighRho], title, headers, rows }
+  }
+}
+
+class Table8 extends IrsstReportTable {
+  constructor() {
+    super(false)
+    this.initEntries({
+      obsValues: [
+        { "worker-1": [31, 60.1, 133, 27.1 ] },
+        { "worker-2" : [61.1, 5.27, 30.4, 31.7] },
+        { "worker-3": [20.5, 16.5, 15.5, 71.5] }
+      ],
+      oel: 85
+    })
+  }
+    
+  defineTableCells() {
+    let c = this.calculate()  
+    let numRes = c.numRes
+  
+    let title = "Exposure metrics point estimates and credible intervals for an example of Bayesian calculation for the lognormal model (between-worker difference analyses) with realistic sample size"
+    let headers = [ "Point estimate and 90% credible interval" ]
+    let rows = [
+      { resType: "groupGMean", label: "Group GM (90% CrI)" },
+      { resType: "gSdB", label: "Between-worker GSD (90% CrI)" },
+      { resType: "gSdW", label: "Within-worker GSD (90% CrI)" },
+      { resType: "rho", label: "Within-worker correlation (rho) (90% CrI)" },
+      { resType: "rho", label: "Probability that rho>0.2", showRisk: true },
+      { resType: "rRatio", label: "R.ratio (90% CrI)" },
+      { resType: "rRatio", label: "Probability that R>2", showRisk: true, riskIdx: 0 },
+      { resType: "rRatio", label: "Probability that R>10", showRisk: true, riskIdx: 1 }
     ]
     return { numericalResults: [numRes], title, headers, rows }
   }
