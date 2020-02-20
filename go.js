@@ -1,13 +1,22 @@
 var tableObj
 var entries
-var lastNumres
+var lastNumRes
+var tableClasses = [
+  Table3,
+  Table4,
+  Table6,
+  Table7,
+  Table8,
+  TableC2,
+  TableC3
+]
 
 $(document).ready(function() {
   $reportTable = $('#reportTable')
-  let tableNos = [3,4,6,8]
-  tableNos.forEach(function(i) {
-    $('#table2Display').append($(`<option value=${i}>`).append(`Table ${i}`))
-  })
+  
+  for ( var i = 0; i < tableClasses.length; i++ ) {
+    $('#table2Display').append($(`<option value=${i}>`).append(`Table ${tableClasses[i].name.replace(/[A-Z][a-z]+/, "")}`))
+  }
 })
 
 function drawTable()
@@ -15,20 +24,7 @@ function drawTable()
   $('#loader').show()
   resetTable()
   let tableType = $('#table2Display').val()
-  switch(tableType) {
-    case '3' :
-      tableObj = new Table3()
-      break
-    case '4' :
-      tableObj = new Table4()
-      break
-    case '6' :
-      tableObj = new Table6()
-      break
-    case '8' :
-      tableObj = new Table8()
-      break
-  }
+  var tableObj = new tableClasses[tableType]()
   setTimeout( function() { tableObj.draw() }, 50)
 }
  
@@ -51,4 +47,24 @@ function showRisk(res, idx = undefined) {
   } else {
      return res.risk
   }
+}
+
+function findExposerWorkers(workerResults)
+{
+  let minGm = Number.POSITIVE_INFINITY
+  let leastExposed = null
+  let maxGm = Number.NEGATIVE_INFINITY
+  let mostExposed = null
+  for ( var wid in workerResults ) {
+    var gm = workerResults[wid].gMean.q[1]
+    if ( gm < minGm ) {
+      minGm = gm
+      leastExposed = wid
+    } else
+    if ( gm > maxGm ) {
+      maxGm = gm
+      mostExposed = wid
+    }
+  }
+  return { leastExposed, mostExposed }
 }
