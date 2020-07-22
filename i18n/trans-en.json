@@ -10,6 +10,7 @@
     "message-documentation": "qqq",
     "AnotherMetadata": "AnotherMedatadataValue"
   },
+  "title": "WebExpo: Towards a Better Interpretation of Measurements of Occupational Exposure to Chemicals in the Workplace",
   "appname-title-seg": "WebExpo: SEG Analysis",
   "appname-title-bw": "WebExpo: Between-Worker Analysis",
   "appname-sub-title": "An example application with jquery.i18n",

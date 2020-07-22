@@ -10,14 +10,60 @@ var tableClasses = [
   TableC2,
   TableC3
 ]
+var lang = 'fr'
 
 $(document).ready(function() {
+  initElems();
+  translateHtml();
   $reportTable = $('#reportTable')
   
   for ( var i = 0; i < tableClasses.length; i++ ) {
     $('#table2Display').append($(`<option value=${i}>`).append(`Table ${tableClasses[i].name.replace(/[A-Z][a-z]+/, "")}`))
   }
 })
+
+function initElems()
+{
+  let lng = getUrlParam('lang')
+  if ( lng != null ) {
+    lang = lng
+  }
+  $('.lang-chooser .lang').each(function() {
+    let l = $(this).data('lang')
+    $(this).text(l.toUpperCase())
+    if ( l == lang ) {
+      $(this).addClass('active')
+    }
+  })
+  $('.lang-chooser .lang:not(.active)').each(function() {
+    $(this).attr('href', window.location.href.replace(/[a-z.?=]*$/, `?lang=${$(this).data('lang')}`))
+    $(this)[0].outerHTML = $(this)[0].outerHTML.replace(/(<\/?)span/g, "$1a")
+  })
+}
+function translateHtml() {
+  var i18n = $.i18n({locale: lang})
+  $('body').attr('data-lang', $.i18n.locale)
+  $.i18n().load( 'i18n/trans-' + i18n.locale + '.json', i18n.locale ).done(function(x) {
+    $('html').i18n()
+  })
+}
+
+function getUrlParam(sParam) {
+  var sPageURL = window.location.search.substring(1),
+      sURLVariables = sPageURL.split('&'),
+      sParameterName,
+      i
+
+  for (i = 0; i < sURLVariables.length; i++) {
+    sParameterName = sURLVariables[i].split('=')
+
+    if (sParameterName[0] === sParam) {
+        return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1])
+    }
+  }
+  
+  return null
+}
 
 function drawTable()
 {

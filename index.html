@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <link href="js/jquery/jquery-ui.css" rel="stylesheet" />
+    <link href="css/style.css" rel="stylesheet" />
     <link href="css/shared.css" rel="stylesheet" />
     <link href="css/seg.css" rel="stylesheet" />
     <script src="js/jquery/jquery-3.2.1.js"></script>
@@ -27,9 +28,16 @@
     <script src="IrsstReportTable.js"></script>
     <script src="go.js"></script>
     
-    <title>IRSST Report Tables - Webexpo Javascript Library Example</title>
+    <title data-i18n="title"></title>
 </head>
 <body>
+  <div class="top-panel">
+    <div class="lang-chooser">
+      <span class="lang" data-lang="fr"></span>
+      <span class="lang" data-lang="en"></span>
+    </div>
+  </div>
+  <h2 class="title" data-i18n="title"></h2>
   <h4>Select IRSST report table</h4>
   <select id="table2Display" class="front-page-input">
   </select>
