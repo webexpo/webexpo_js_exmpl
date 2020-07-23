@@ -13,6 +13,7 @@
   "title": "WebExpo: Towards a Better Interpretation of Measurements of Occupational Exposure to Chemicals in the Workplace",
   "table3-title" : "Exposure metrics point estimates and credible intervals for an example of Bayesian calculation for the lognormal model",
   "table4-title" : "Exposure metrics point estimates and credible intervals for 4 choices of prior distribution",
+  "table6-title" : "Exposure metrics point estimates and credible intervals for an example of Bayesian calculation for the lognormal model (between-worker difference analyses)",
   "curr-lang" : "Current display language",
   "select-table" : "Select IRSST report table",
   "appname-title-seg": "WebExpo: SEG Analysis",

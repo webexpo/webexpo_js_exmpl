@@ -105,6 +105,30 @@ class IrsstReportTable {
     return false
   }
 
+  translateTableLabel(lbl) {
+    let k = 0, l = 0, tokens = [], match = null
+    if ( lbl.indexOf(')') >= 0 ) {
+      while ( (l = lbl.indexOf(')', k)) >= 0 ) {
+        let substr = lbl.substring(k, l+1)
+        match = substr.match(/^(\s?)(.*[^\s])(\s?)\(([^)]+)\)/)
+        if ( $.isArray(match) ) {
+          tokens.push(`${match[1]}${$.i18n(match[2])}${match[3]}(${$.i18n(match[4])})`)
+        }
+        k = l+1
+      }
+      lbl = tokens.join('')
+    } else {
+      match = lbl.match(/(^.+)\s([a-zA-Z]*)(>)([0-9.%]+)$/)
+      if ( $.isArray(match) && match.length == 5 ) {
+        lbl = `${$.i18n(match[1])} ${match[2]}${match[2].length > 0 ? " " : ""}${$.i18n(match[3])} ${match[4]}`
+      } else {
+        lbl = $.i18n(lbl)
+      }
+    }
+    
+    return lbl
+  }
+  
   defineTableCells() {
     return { title: "--", numericalResults: [], headers: [], rows: [] }
   }
@@ -113,19 +137,15 @@ class IrsstReportTable {
     let cells = this.defineTableCells()
     $('#tableTitle').text($.i18n(`table${cells.tableNo}-title`))
       .width($('#reportTable').width()*.95)
+    
+    let ths = this
     cells.headers.forEach(function(header) {
       $reportTable.find('.heading')
-        .append($('<th>').append($.i18n(header)))
+        .append($('<th>').append(ths.translateTableLabel(header)))
     })
     
     cells.rows.forEach(function(row) {
-      let match = row.label.match(/^(.+[^\s])(\s?)\(([^)]+)\)$/)
-        if ( $.isArray(match) && match.length == 4 ) {
-          row.label = `${$.i18n(match[1])}${match[2]}(${$.i18n(match[3])})`
-        } else {
-          row.label = $.i18n(row.label)
-        }
-      let $tr = $("<tr>").append($("<td>").append(row.label))
+      let $tr = $("<tr>").append($("<td>").append(ths.translateTableLabel(row.label)))
       cells.numericalResults.forEach(function(numRes) {
         let res = numRes[row.resType]
         let val = ""
@@ -268,7 +288,7 @@ class Table6 extends IrsstReportTable {
     let c2 = this.calculate()  
     let numResHighRho = c2.numRes
     
-    let title = "Exposure metrics point estimates and credible intervals for an example of Bayesian calculation for the lognormal model (between-worker difference analyses"
+    let tableNo = '6'
     let headers = [ "Low within-worker correlation (rho=0.06)", "High within-worker correlation (rho=0.66)"]
     let rows = [
       { resType: "groupGMean", label: "Group GM (90% CrI)" },
@@ -284,7 +304,7 @@ class Table6 extends IrsstReportTable {
       { resType: "probIndOverXAMean", label: "Probability of individual overexposure (arithmetic mean) in % (90% CrI)" },
       { resType: "probIndOverXAMean", label: "Chances that the above probability is >20%", showRisk: true }
     ]
-    return { numericalResults: [numResLowRho, numResHighRho], title, headers, rows }
+    return { numericalResults: [numResLowRho, numResHighRho], tableNo, headers, rows }
   }
 }
 
