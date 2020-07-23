@@ -21,7 +21,7 @@
     margin-top: 10px;
 }
 
-button:hover {
+button:hover:not(:disabled) {
     color: darkgreen;
 }
 
@@ -215,7 +215,7 @@ div.table-div {
   margin-bottom: 7px;
   font-variant: small-caps;
   color: darkgreen;
-  width: 75%;
+  width: 60%;
   margin-left: auto;
   margin-right: auto;
 }

@@ -111,13 +111,20 @@ class IrsstReportTable {
   
   draw() {
     let cells = this.defineTableCells()
-    $('#tableTitle').text(cells.title)
+    $('#tableTitle').text($.i18n(`table${cells.tableNo}-title`))
+      .width($('#reportTable').width()*.95)
     cells.headers.forEach(function(header) {
       $reportTable.find('.heading')
-        .append($('<th>').append(header))
+        .append($('<th>').append($.i18n(header)))
     })
     
     cells.rows.forEach(function(row) {
+      let match = row.label.match(/^(.+[^\s])(\s?)\(([^)]+)\)$/)
+        if ( $.isArray(match) && match.length == 4 ) {
+          row.label = `${$.i18n(match[1])}${match[2]}(${$.i18n(match[3])})`
+        } else {
+          row.label = $.i18n(row.label)
+        }
       let $tr = $("<tr>").append($("<td>").append(row.label))
       cells.numericalResults.forEach(function(numRes) {
         let res = numRes[row.resType]
@@ -127,11 +134,17 @@ class IrsstReportTable {
         } else {
           val = showRisk(res, row.riskIdx)
         }
+        
+        /* Decimal separator */
+        val = val.replace(/(\d+).(\d+)/g, "$1,$2")
+        
         $tr.append($("<td>").append(val))
       })
       $reportTable.find('tbody').append($tr)
     })
-    $(".table-div").show()
+    $(".table-div").show('fast', function() {
+      $('#tableTitle').width($('#reportTable').width()*.95)
+    })
     $('#loader').hide()
   }
   
@@ -152,8 +165,8 @@ class Table3 extends IrsstReportTable {
   defineTableCells() {
     let c = this.calculate()  
     let numRes = c.numRes
+    let tableNo = '3'
   
-    let title = "Exposure metrics point estimates and credible intervals for an example of Bayesian calculation for the lognormal model"
     let headers = [ "Point estimates and 90% credible interval" ]
     let rows = [
       { resType: "gMean", label: "GM" },
@@ -164,7 +177,7 @@ class Table3 extends IrsstReportTable {
       { resType: "aMean", label: "Arithmetic mean", appendRisk: true },
       { resType: "aihaBandAM", label: "AIHA band probabilities in % (AM)", showRisk: true }
     ]
-    return { numericalResults: [numRes], title, headers, rows }
+    return { tableNo, numericalResults: [numRes], headers, rows }
   }
 }
 
@@ -180,6 +193,7 @@ class Table4 extends IrsstReportTable {
   defineTableCells() {
     let cInf = this.calculate()
     let numResInf = cInf.numRes
+    let tableNo = '4'
       
     this.initEntries({
       sdRangeInf: "0",
@@ -199,7 +213,6 @@ class Table4 extends IrsstReportTable {
   
     let allRes = [numResInf, numResUninf, numResPd]
 
-    let title = "Exposure metrics point estimates and credible intervals for 3 choices of prior distribution"
     let headers = ["Informedvar", "Uninformative", "Past.data"]
     let rows = [
       { resType: "gMean", label: "GM (90% CrI)" },
@@ -211,7 +224,7 @@ class Table4 extends IrsstReportTable {
       { resType: "aMean", label: "Overexposure risk (%, AM)", showRisk: true }
     ]
     
-    return { numericalResults: allRes, title, headers, rows }
+    return { numericalResults: allRes, tableNo, headers, rows }
   }
 }
 

@@ -1,0 +1,37 @@
+html, body {
+  width: 99.5%;
+  font-family: Arial,Helvetica,sans-serif;
+  font-size: 1em;
+  margin: 0;
+  padding: 5px;
+}
+
+div.top-panel {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.lang-chooser {
+  float: right;
+  padding: 5px;
+}
+
+.lang-chooser > .lang {
+  text-decoration: none;
+  color: cornflowerblue;
+}
+
+.lang-chooser > .lang.active {
+  font-weight: bold;
+}
+
+.title {
+  width: 80%;
+  display: inline-block;
+}
+
+#drawButton:not(:disabled) {
+  cursor: pointer;
+}

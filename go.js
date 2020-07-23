@@ -13,26 +13,18 @@ var tableClasses = [
 var lang = 'fr'
 
 $(document).ready(function() {
-  initElems();
-  translateHtml();
   $reportTable = $('#reportTable')
-  
-  for ( var i = 0; i < tableClasses.length; i++ ) {
-    $('#table2Display').append($(`<option value=${i}>`).append(`Table ${tableClasses[i].name.replace(/[A-Z][a-z]+/, "")}`))
-  }
+  translateHtml()
 })
 
 function initElems()
 {
-  let lng = getUrlParam('lang')
-  if ( lng != null ) {
-    lang = lng
-  }
   $('.lang-chooser .lang').each(function() {
     let l = $(this).data('lang')
     $(this).text(l.toUpperCase())
     if ( l == lang ) {
       $(this).addClass('active')
+      $(this).attr('title', $.i18n('curr-lang'))
     }
   })
   $('.lang-chooser .lang:not(.active)').each(function() {
@@ -40,11 +32,19 @@ function initElems()
     $(this)[0].outerHTML = $(this)[0].outerHTML.replace(/(<\/?)span/g, "$1a")
   })
 }
+  
 function translateHtml() {
+  let lng = getUrlParam('lang')
+  if ( lng != null ) {
+    lang = lng
+  }
+  
   var i18n = $.i18n({locale: lang})
   $('body').attr('data-lang', $.i18n.locale)
   $.i18n().load( 'i18n/trans-' + i18n.locale + '.json', i18n.locale ).done(function(x) {
     $('html').i18n()
+    initElems()
+    loadTables()
   })
 }
 
@@ -65,6 +65,16 @@ function getUrlParam(sParam) {
   return null
 }
 
+function loadTables()
+{ 
+  $select = $('#table2Display')
+  $select.append($(`<option value disabled selected>`).append(`-- ${$.i18n('select-table')} --`))
+  for ( var i = 0; i < tableClasses.length; i++ ) {
+    $select.append($(`<option value=${i}>`).append(`${$.i18n('Table')} ${tableClasses[i].name.replace(/[A-Z][a-z]+/, "")}`))
+  }
+  $select.change()
+}
+  
 function drawTable()
 {
   $('#loader').show()
@@ -83,7 +93,7 @@ function resetTable()
 
 function showEstimateWInterval(res, numDigitsAfterDecimal = 1, appendRisk = false)
 {
-  return `${res.q[1].toFixed(numDigitsAfterDecimal)} [${res.q[0].toFixed(numDigitsAfterDecimal)} - ${res.q[2].toFixed(numDigitsAfterDecimal)}]${appendRisk ? ` Overexposure risk: ${showRisk(res)}` : ""}`
+  return `${res.q[1].toFixed(numDigitsAfterDecimal)} [${res.q[0].toFixed(numDigitsAfterDecimal)} - ${res.q[2].toFixed(numDigitsAfterDecimal)}]${appendRisk ? `<br>${$.i18n('Overexposure risk:')} ${showRisk(res)}` : ""}`
 }
 
 function showRisk(res, idx = undefined) {
@@ -113,4 +123,10 @@ function findExposerWorkers(workerResults)
     }
   }
   return { leastExposed, mostExposed }
+}
+
+function enableDrawButton(event)
+{
+  $targ = $(event.target)
+  $targ.next('button').prop('disabled', $targ.find('option:selected').prop('disabled'))
 }
