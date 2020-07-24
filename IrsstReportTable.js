@@ -140,9 +140,19 @@ class IrsstReportTable {
     
     let ths = this
     cells.headers.forEach(function(header) {
+      let headerTxt = typeof header == "string" ? header : header.header
+      let attr = typeof header == "string" ? "" : header.elemAttrs
       $reportTable.find('.heading')
-        .append($('<th>').append(ths.translateTableLabel(header)))
+        .append($(`<th ${attr}>`).append(ths.translateTableLabel(headerTxt)))
     })
+    
+    if ( typeof cells.subheaders !== 'undefined' ) {
+      cells.subheaders.forEach(function(subheader) {
+      $reportTable.find('.sub-heading')
+        .append($(`<th>`).append(ths.translateTableLabel(subheader)))
+      })
+      $reportTable.find('.sub-heading').addClass('show')
+    }
     
     cells.rows.forEach(function(row) {
       let $tr = $("<tr>").append($("<td>").append(ths.translateTableLabel(row.label)))
@@ -352,8 +362,9 @@ class Table7 extends IrsstReportTable {
     let numResHighRhoLeastExposed = cHigh.numRes.workerResults[highRhoExposed.leastExposed]
     let numResHighRhoMostExposed = cHigh.numRes.workerResults[highRhoExposed.mostExposed]
     
-    let title = "Worker specific exposure metrics point estimates and credible intervals for the least and most exposed workers in two samples with low and high within-worker correlation"
-    let headers = [ "Least exposed worker (rho=0.06)", "Most exposed worker (rho=0.06)", "Least exposed worker (rho=0.66)", "Most exposed worker (rho=0.66)" ]
+    let tableNo = '7'
+    let headers = [ { header: "Least exposed worker (GM)", elemAttrs: "colspan='2'" }, { header: "Most exposed worker (GM)", elemAttrs: "colspan='2'" } ]
+    let subheaders = [ "Least exposed worker (rho=0.06)", "Most exposed worker (rho=0.06)", "Least exposed worker (rho=0.66)", "Most exposed worker (rho=0.66)" ]
     let rows = [
       { resType: "gMean", label: "GM" },
       { resType: "gSd", label: "GSD" },
@@ -361,7 +372,7 @@ class Table7 extends IrsstReportTable {
       { resType: "percOfInterest", label: "95th percentile" },
       { resType: "aMean", label: "AM" }
     ]
-    return { numericalResults: [numResLowRhoLeastExposed, numResLowRhoMostExposed, numResHighRhoLeastExposed, numResHighRhoMostExposed], title, headers, rows }
+    return { numericalResults: [numResLowRhoLeastExposed, numResLowRhoMostExposed, numResHighRhoLeastExposed, numResHighRhoMostExposed], tableNo, headers, subheaders, rows }
   }
 }
 
@@ -382,7 +393,7 @@ class Table8 extends IrsstReportTable {
     let c = this.calculate()  
     let numRes = c.numRes
   
-    let title = "Exposure metrics point estimates and credible intervals for an example of Bayesian calculation for the lognormal model (between-worker difference analyses) with realistic sample size"
+    let tableNo = '8'
     let headers = [ "Point estimate and 90% credible interval" ]
     let rows = [
       { resType: "groupGMean", label: "Group GM (90% CrI)" },
@@ -398,7 +409,7 @@ class Table8 extends IrsstReportTable {
       { resType: "probIndOverXAMean", label: "Probability of individual overexposure (arithmetic mean) in % (90% CrI)" },
       { resType: "probIndOverXAMean", label: "Chances that the above probability is >20%", showRisk: true }
     ]
-    return { numericalResults: [numRes], title, headers, rows }
+    return { numericalResults: [numRes], tableNo, headers, rows }
   }
 }
 
@@ -415,7 +426,7 @@ class TableC2 extends IrsstReportTable {
     let c = this.calculate()  
     let numRes = c.numRes
   
-    let title = "Exposure metrics point estimates and credible intervals for an example of Bayesian calculation for the normal model"
+    let tableNo = 'C2'
     let headers = [ "Point estimates and 90% credible interval" ]
     let rows = [
       { resType: "aMean", label: "Arithmetic mean" },
@@ -423,7 +434,7 @@ class TableC2 extends IrsstReportTable {
       { resType: "exceedanceFraction", label: "Exceedance fraction (%)" },
       { resType: "percOfInterest", label: "95th percentile" }
     ]
-    return { numericalResults: [numRes], title, headers, rows }
+    return { numericalResults: [numRes], tableNo, headers, rows }
   }
 }
 
@@ -451,9 +462,10 @@ class TableC3 extends IrsstReportTable {
     let c = this.calculate()
     let numRes = c.numRes
   
-    let title = "Exposure metrics point estimates and credible intervals for an example of Bayesian calculation for the normal model (between-worker difference analyses)"
+    let tableNo = 'C3'
     let headers = [ "Point estimates and 90% credible interval" ]
     let rows = [
+      { resType: "groupMean", label: "Arithmetic mean (90% CrI)" },
       { resType: "aSdB", label: "Between-worker arithmetic standard deviation (90% CrI)" },
       { resType: "aSdW", label: "Within-worker arithmetic standard deviation (90% CrI)" },
       { resType: "rho", label: "Within-worker correlation (rho) (90% CrI)" },
@@ -464,6 +476,6 @@ class TableC3 extends IrsstReportTable {
       { resType: "probIndOverXAMean", label: "Probability of individual overexposure (arithmetic mean) in % (90% CrI)" },
       { resType: "probIndOverXAMean", label: "Chances that the above probability is >20%", showRisk: true }
     ]
-    return { numericalResults: [numRes], title, headers, rows }
+    return { numericalResults: [numRes], tableNo, headers, rows }
   }
 }

@@ -210,6 +210,10 @@ div.table-div {
   padding: 4px;
 }
 
+#reportTable tr.sub-heading:not(.show) {
+  display: none;
+}
+
 #tableTitle {
   text-align: center;
   margin-bottom: 7px;

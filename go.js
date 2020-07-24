@@ -87,8 +87,9 @@ function drawTable()
 function resetTable()
 {
   $(".table-div").hide()
-  $reportTable.find('th:not(:first)').remove()
+  $reportTable.find('thead tr th:not(:first-child)').remove()
   $reportTable.find('tbody tr').remove()
+  $reportTable.find('.sub-heading').removeClass('show')
 }
 
 function showEstimateWInterval(res, numDigitsAfterDecimal = 1, appendRisk = false)
