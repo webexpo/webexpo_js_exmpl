@@ -465,7 +465,7 @@ class TableC3 extends IrsstReportTable {
     let tableNo = 'C3'
     let headers = [ "Point estimates and 90% credible interval" ]
     let rows = [
-      { resType: "groupMean", label: "Arithmetic mean (90% CrI)" },
+      { resType: "groupMean", label: "Group AM (90% CrI)" },
       { resType: "aSdB", label: "Between-worker arithmetic standard deviation (90% CrI)" },
       { resType: "aSdW", label: "Within-worker arithmetic standard deviation (90% CrI)" },
       { resType: "rho", label: "Within-worker correlation (rho) (90% CrI)" },

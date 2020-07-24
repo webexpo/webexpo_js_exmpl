@@ -47,6 +47,7 @@
   "Low within-worker correlation" : "Faible corrélation intratravailleur",
   "High within-worker correlation" : "Forte corrélation intratravailleur",
   "Group GM" : "MG de groupe",
+  "Group AM" : "MA de groupe",
   "Between-worker GSD" : "ÉTG inter-travailleur",
   "Within-worker GSD" : "ÉTG intra-travailleur",
   "Within-worker correlation" : "Corrélation intra-travailleur",
