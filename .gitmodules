@@ -1,3 +1,3 @@
 [submodule "webexpo"]
 	path = webexpo
-	url = https://github.com/webexpo/webexpo_js_lib.git
+	url = https://github.com/webexpo/webexpo_js_lib

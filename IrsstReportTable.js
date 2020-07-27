@@ -2,7 +2,7 @@ class IrsstReportTable {
   constructor(segModel, logDstrn) {
     this.isSEGModel = typeof segModel === 'undefined' || segModel
     this.isLogDstrn = typeof logDstrn === 'undefined' || logDstrn
-    this.module = this.isSEGModel ? zygotine.SEG : zygotine.BW
+    this.module = zygotine.X.common = this.isSEGModel ? zygotine.SEG : zygotine.BW
     this.module.setDataEntries()
   }
   
