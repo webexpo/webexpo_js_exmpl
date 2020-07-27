@@ -226,7 +226,7 @@ class Table4 extends IrsstReportTable {
     let tableNo = '4'
       
     this.initEntries({
-      sdRangeInf: "0",
+      sdRangeInf: "0.095",
       sdRangeSup: "2.3"
     }, false)
     let cUninf = this.calculate()
