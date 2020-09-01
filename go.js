@@ -1,15 +1,15 @@
 var tableObj
 var entries
 var lastNumRes
-var tableClasses = [
-  Table3,
-  Table4,
-  Table6,
-  Table7,
-  Table8,
-  TableC2,
-  TableC3
-]
+var tableClasses = {
+  'table3'  : Table3,
+  'table4'  : Table4,
+  'table6'  : Table6,
+  'table7'  : Table7,
+  'table8'  : Table8,
+  'tableC2' : TableC2,
+  'tableC3' : TableC3
+}
 var lang = 'fr'
 
 $(document).ready(function() {
@@ -69,17 +69,19 @@ function loadTables()
 { 
   $select = $('#table2Display')
   $select.append($(`<option value disabled selected>`).append(`-- ${$.i18n('select-table')} --`))
-  for ( var i = 0; i < tableClasses.length; i++ ) {
-    $select.append($(`<option value=${i}>`).append(`${$.i18n('Table')} ${tableClasses[i].name.replace(/[A-Z][a-z]+/, "")}`))
+  for ( var i in tableClasses ) {
+    $select.append($(`<option value="${i}">`).append(`${$.i18n('Table')} ${tableClasses[i].name.replace(/[A-Z][a-z]+/, "")}`))
   }
   $select.change()
 }
   
-function drawTable()
+function drawTable(tableType)
 {
   $('#loader').show()
   resetTable()
-  let tableType = $('#table2Display').val()
+  if ( typeof tableType === 'undefined' ) {
+    tableType = $('#table2Display').val()
+  }
   var tableObj = new tableClasses[tableType]()
   setTimeout( function() { tableObj.draw() }, 50)
 }
@@ -130,4 +132,29 @@ function enableDrawButton(event)
 {
   $targ = $(event.target)
   $targ.next('button').prop('disabled', $targ.find('option:selected').prop('disabled'))
+}
+
+function genBilan(tbls)
+{
+  if ( typeof tbls === 'undefined' ) {
+    tbls = [ 'table3', 'table4', 'table6', 'table8', 'tableC2', 'tableC3' ]
+  }
+  
+  let bilan = {}
+  
+  tbls.forEach(function(tbl) {
+    let obj = new tableClasses[tbl]()
+    let r = obj.calculate()
+    let isBW = typeof r.modelRes.chains.muOverallSample !== 'undefined'
+    let mu = new zygotine.S.Quantile().compute(r.modelRes.chains[isBW ? "muOverallSample" : "muSample"].data)
+    let sigma = new zygotine.S.Quantile().compute(r.modelRes.chains[isBW ? "sigmaBetweenSample" : "sdSample"].data)
+    if ( isBW ) {
+      let sigmaW = new zygotine.S.Quantile().compute(r.modelRes.chains.sigmaWithinSample.data)
+      bilan[tbl] = { mu, sigma, sigmaW }
+    } else {
+      bilan[tbl] = { mu, sigma }
+    }
+  })
+  
+  return bilan
 }
