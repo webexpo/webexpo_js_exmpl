@@ -2,11 +2,24 @@ class IrsstReportTable {
   constructor(segModel, logDstrn) {
     this.isSEGModel = typeof segModel === 'undefined' || segModel
     this.isLogDstrn = typeof logDstrn === 'undefined' || logDstrn
+    this.modelParams = []
+    this.modelIdx = 0
     this.module = zygotine.X.common = this.isSEGModel ? zygotine.SEG : zygotine.BW
     this.module.setDataEntries()
   }
   
-  initEntries(params, isInfModel) {
+  addModelParams(params, isInfModel) {
+    if ( typeof isInfModel === 'undefined' ) {
+      isInfModel = true
+    }
+    this.modelParams.push( {params, isInfModel} )
+  }
+  
+  initEntries() {
+    let mp = this.modelParams[this.modelIdx++]
+    let params = mp.params
+    let isInfModel = mp.isInfModel
+    
     entries = this.module.dataEntries
     if ( typeof isInfModel === 'undefined' ) {
       isInfModel = true
@@ -210,13 +223,14 @@ class IrsstReportTable {
 class Table3 extends IrsstReportTable {
   constructor() {
     super()
-    this.initEntries({
+    this.addModelParams({
       obsValues: ["24.7", "64.1", "13.8", "43.7", "19.9", "133", "32.1", "15", "53.7"],
       oel: "100"
     })
   }
     
   defineTableCells() {
+    this.initEntries()
     let c = this.calculate()  
     let numRes = c.numRes
     let tableNo = '3'
@@ -238,30 +252,33 @@ class Table3 extends IrsstReportTable {
 class Table4 extends IrsstReportTable {
   constructor() {
     super()
-    this.initEntries({
+    this.addModelParams({
       obsValues: ["24.7", "64.1", "13.8", "43.7", "19.9", "133", "32.1", "15", "53.7"],
       oel: "100"
     })
-  }
-  
-  defineTableCells() {
-    let cInf = this.calculate()
-    let numResInf = cInf.numRes
-    let tableNo = '4'
-      
-    this.initEntries({
+    this.addModelParams({
       sdRangeInf: "0.095",
       sdRangeSup: "2.3"
     }, false)
-    let cUninf = this.calculate()
-    let numResUninf = cUninf.numRes
-    
-    this.initEntries({
+    this.addModelParams({
       withPastData: true,
       pdMean: Math.log(5),
       pdSd: Math.log(2.4),
       pdN: 5
     })
+  }
+  
+  defineTableCells() {
+    this.initEntries()
+    let cInf = this.calculate()
+    let numResInf = cInf.numRes
+    let tableNo = '4'
+      
+    this.initEntries()
+    let cUninf = this.calculate()
+    let numResUninf = cUninf.numRes
+    
+    this.initEntries()
     let cPd = this.calculate()
     let numResPd = cPd.numRes
   
@@ -285,20 +302,21 @@ class Table4 extends IrsstReportTable {
 class Table6 extends IrsstReportTable {
   constructor() {
     super(false)
-    this.initEntries({
+    this.addModelParams({
       obsValues: IrsstReportTable.lowRhoSample,
         oel: "150"
+    })
+    this.addModelParams({
+      obsValues: IrsstReportTable.highRhoSample
     })
   }
     
   defineTableCells() {
+    this.initEntries()
     let c = this.calculate()  
     let numResLowRho = c.numRes
   
-    this.initEntries({
-      obsValues: IrsstReportTable.highRhoSample
-    })
-    
+    this.initEntries()
     let c2 = this.calculate()  
     let numResHighRho = c2.numRes
     
@@ -325,21 +343,23 @@ class Table6 extends IrsstReportTable {
 class Table7 extends IrsstReportTable {
   constructor() {
     super(false)
-    this.initEntries({
+    this.addModelParams({
       obsValues: IrsstReportTable.lowRhoSample,
       oel: "150"
+    })
+    this.addModelParams({
+      obsValues: IrsstReportTable.highRhoSample
     })
   }
     
   defineTableCells() {
+    this.initEntries()
     let cLow = this.calculate()
     let lowRhoExposed = findExposerWorkers(cLow.numRes.workerResults)
     let numResLowRhoLeastExposed = cLow.numRes.workerResults[lowRhoExposed.leastExposed]
     let numResLowRhoMostExposed = cLow.numRes.workerResults[lowRhoExposed.mostExposed]
   
-    this.initEntries({
-      obsValues: IrsstReportTable.highRhoSample
-    })
+    this.initEntries()
     
     let cHigh = this.calculate()  
     let highRhoExposed = findExposerWorkers(cHigh.numRes.workerResults)
@@ -363,7 +383,7 @@ class Table7 extends IrsstReportTable {
 class Table8 extends IrsstReportTable {
   constructor() {
     super(false)
-    this.initEntries({
+    this.addModelParams({
       obsValues: [
         { "worker-1": [31, 60.1, 133, 27.1 ] },
         { "worker-2" : [61.1, 5.27, 30.4, 31.7] },
@@ -374,6 +394,7 @@ class Table8 extends IrsstReportTable {
   }
     
   defineTableCells() {
+    this.initEntries()
     let c = this.calculate()  
     let numRes = c.numRes
   
@@ -400,13 +421,14 @@ class Table8 extends IrsstReportTable {
 class TableC2 extends IrsstReportTable {
   constructor() {
     super(true, false)
-    this.initEntries({
+    this.addModelParams({
       obsValues: [ 81, 79.5, 80.7, 78.1, 80.1, 74.8, 74.8, 79.8, 79.8 ],
       oel: 85
     }, false)
   }
     
   defineTableCells() {
+    this.initEntries()
     let c = this.calculate()  
     let numRes = c.numRes
   
@@ -425,7 +447,7 @@ class TableC2 extends IrsstReportTable {
 class TableC3 extends IrsstReportTable {
   constructor() {
     super(false, false)
-    this.initEntries({
+    this.addModelParams({
       obsValues: [
         { "worker-1" : [76.2, 82.3, 81.7, 73.7, 79.4, 79.1, 80.2, 71, 86.9, 75.6] },
         { "worker-2" : [ 70.6, 78.7, 77.6, 76.9, 79.5, 84.8, 77.6, 65.5, 74.1, 69.9 ] },
@@ -443,6 +465,7 @@ class TableC3 extends IrsstReportTable {
   }
     
   defineTableCells() {
+    this.initEntries()
     let c = this.calculate()
     let numRes = c.numRes
   

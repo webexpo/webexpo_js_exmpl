@@ -144,16 +144,23 @@ function genBilan(tbls)
   
   tbls.forEach(function(tbl) {
     let obj = new tableClasses[tbl]()
-    let r = obj.calculate()
-    let isBW = typeof r.modelRes.chains.muOverallSample !== 'undefined'
-    let mu = new zygotine.S.Quantile().compute(r.modelRes.chains[isBW ? "muOverallSample" : "muSample"].data)
-    let sigma = new zygotine.S.Quantile().compute(r.modelRes.chains[isBW ? "sigmaBetweenSample" : "sdSample"].data)
-    if ( isBW ) {
-      let sigmaW = new zygotine.S.Quantile().compute(r.modelRes.chains.sigmaWithinSample.data)
-      bilan[tbl] = { mu, sigma, sigmaW }
-    } else {
-      bilan[tbl] = { mu, sigma }
+    let rs = {}
+    for ( var i = 0; i < obj.modelParams.length; i++ ) {
+      obj.initEntries()
+      let r = obj.calculate()
+      let isBW = typeof r.modelRes.chains.muOverallSample !== 'undefined'
+      let mp = obj.modelParams[i]
+      let idx = `infModel-${mp.isInfModel ? 1 : 0}-pastData-${typeof mp.params.withPastData !== 'undefined' ? 1 : 0}`
+      let mu = new zygotine.S.Quantile().compute(r.modelRes.chains[isBW ? "muOverallSample" : "muSample"].data)
+      let sigma = new zygotine.S.Quantile().compute(r.modelRes.chains[isBW ? "sigmaBetweenSample" : "sdSample"].data)
+      if ( isBW ) {
+        let sigmaW = new zygotine.S.Quantile().compute(r.modelRes.chains.sigmaWithinSample.data)
+        rs[idx] = { mu, sigma, sigmaW }
+      } else {
+        rs[idx] = { mu, sigma }
+      }
     }
+    bilan[tbl] = rs
   })
   
   return bilan
