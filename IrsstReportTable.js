@@ -38,9 +38,12 @@ class IrsstReportTable {
     entries.dstrn.currentValue = this.isLogDstrn ? 'logN' : 'norm'
     
     let defVals = this.module.defaultEntryValues
+    let myDefVals = this.getModelParamDefaults()[this.isSEGModel ? 'SEG' : 'BW']
     let modelType = isInfModel ? (this.isSEGModel ? 'inform' : 'expostats') : (this.isSEGModel ? 'unInform' : 'uupOnSds')
     for ( var i in defVals ) {
-      entries[i].currentValue = defVals[i][entries.dstrn.currentValue][modelType]
+      let defVal = defVals[i][entries.dstrn.currentValue][modelType]
+      let myDefVal = myDefVals[i]
+      entries[i].currentValue = typeof myDefVal !== 'undefined' ? myDefVal : defVal
     }
     
     for ( var entr in params ) {
@@ -59,8 +62,39 @@ class IrsstReportTable {
     }
   }
   
-  getParams() {
-    return {}
+  getModelParamDefaults() {
+    return {
+      SEG : {
+        muLower: -20,
+        muUpper: 20,
+        logSigmaMu: -0.1744,
+        logSigmaPrec: 2.5523, 
+        sdRangeInf: 0,
+        sdRangeSup: 2.3,
+        percOfInterest: 95, 
+        fracThreshold: 5,
+        initMu: Math.log(0.3),
+        initSigma: Math.log(2.5),
+        nIter: 25000,
+        nBurnin: 5000
+      },
+      BW : {
+        muOverallLower: -20,
+        muOverallUpper: 20,
+        sigmaBetweenRangeInf: 0.095,
+        sigmaBetweenRangeSup: 2.3,
+        sigmaWithinRangeInf: 0.095,
+        sigmaWithinRangeSup: 2.3,
+        logSigmaBetweenMu: -0.8786,
+        logSigmaBetweenPrec: 1.634,
+        logSigmaWithinMu: -0.4106,
+        logSigmaWithinPrec: 1.9002,  
+        initMuOverall: Math.log(0.3),
+        initSigmaWithin: Math.log(2.5),
+        nIter: 25000,
+        nBurnin: 5000
+      }
+    }
   }
   
   calculate() {
