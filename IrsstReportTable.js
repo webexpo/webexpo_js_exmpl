@@ -47,6 +47,7 @@ class IrsstReportTable {
         entries[i].currentValue = myDefVal
         console.log(`Overwriting system default of ${defVal} with ${myDefVal} for ${i}`)
       } else {
+        console.log(`Using system default of ${defVal} for ${i}`)
         entries[i].currentValue = defVal
       }
     }
