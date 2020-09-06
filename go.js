@@ -134,14 +134,13 @@ function enableDrawButton(event)
   $targ.next('button').prop('disabled', $targ.find('option:selected').prop('disabled'))
 }
 
-function genBilan(tbls)
+function genBilan(tbls, openAsText)
 {
   if ( typeof tbls === 'undefined' ) {
     tbls = [ 'table3', 'table4', 'table6', 'table8', 'tableC2', 'tableC3' ]
   }
   
   let bilan = {}
-  
   tbls.forEach(function(tbl) {
     let obj = new tableClasses[tbl]()
     let rs = {}
@@ -163,5 +162,41 @@ function genBilan(tbls)
     bilan[tbl] = rs
   })
   
+  if ( typeof openAsText === 'undefined' ) {
+    openAsText = false
+  }
+  if ( openAsText ) {
+    openTextWindow(bilan)
+  }
   return bilan
+}
+
+function openTextWindow(bilan)
+{
+  let lines = []
+  let sep = ';'
+  let quantiles = [ 0.025, 0.05, 0.01, 0.025, 0.5, 0.75, 0.9, 0.95, 0.975 ]
+  
+  for ( var b in bilan ) {
+    lines.push(b.toUpperCase())
+    lines.push("")
+    for ( var c in bilan[b] ) {
+      lines.push(`--${c}--`)
+      
+      lines.push(`CENTILE${sep}MU${sep}SIGMA${Object.keys(bilan[b][c]).length == 2 ? '' : "SIGMA_W"}`)
+      for ( var i = 0; i < quantiles.length; i++ ) {
+        let line = quantiles[i]
+        for ( var chainName in bilan[b][c] ) {
+          line += `${sep}${bilan[b][c][chainName][i]}`
+        }
+        lines.push(line)
+      }
+    }
+    lines.push("")
+  }
+  
+  let width=1000
+  let height=800
+  var myWindow = window.open("", "MsgWindow", `width=${width},height=${height}`)
+  myWindow.document.write(lines.join("<br>"))
 }

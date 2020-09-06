@@ -43,7 +43,12 @@ class IrsstReportTable {
     for ( var i in defVals ) {
       let defVal = defVals[i][entries.dstrn.currentValue][modelType]
       let myDefVal = myDefVals[i]
-      entries[i].currentValue = typeof myDefVal !== 'undefined' ? myDefVal : defVal
+      if ( typeof myDefVal !== 'undefined' ) {
+        entries[i].currentValue = myDefVal
+        console.log(`Overwriting system default of ${defVal} with ${myDefVal} for ${i}`)
+      } else {
+        entries[i].currentValue = defVal
+      }
     }
     
     for ( var entr in params ) {
